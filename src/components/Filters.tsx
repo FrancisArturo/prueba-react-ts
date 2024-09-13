@@ -25,7 +25,7 @@ export const Filters: React.FC<Props> = ({
 	};
 
 	return (
-		<div>
+		<>
 			<button
 				type="button"
 				onClick={
@@ -54,6 +54,6 @@ export const Filters: React.FC<Props> = ({
 				placeholder="ingrese el país"
 				onChange={(e) => onChangeInputSearch(e)}
 			/>
-		</div>
+		</>
 	);
 };

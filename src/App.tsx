@@ -18,7 +18,7 @@ function App() {
 
 	return (
 		<>
-			<h1>App</h1>
+			<h1>App de usuarios</h1>
 			<header>
 				<Filters
 					sorting={sorting}
