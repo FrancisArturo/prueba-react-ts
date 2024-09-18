@@ -7,16 +7,37 @@ export const useGetUsers = () => {
 	const [users, setUsers] = useState<mappedUser[]>([]);
 	const [isColorActive, setIsColorActive] = useState(false);
 	const [sorting, setSorting] = useState<SortBy>(SortBy.NONE);
+	const [loading, setLoading] = useState(false);
+	const [currentPage, setCurrentPage] = useState(1);
+	const [error, setError] = useState({
+		status: false,
+		message: "",
+	});
 
 	const originalUsers = useRef<mappedUser[]>([]); // useRef -> para guardar un valor
 	// que queremos que se comparta entre renderizados
 	// pero que al cambiar, no vuelva a renderizar el componente
 
-	const handleGetUsers = async () => {
-		const usersDataReceived = await getUsers();
-		const usersMapped = mapUsers(usersDataReceived);
-		setUsers(usersMapped);
-		originalUsers.current = [...usersMapped];
+	const handleGetUsers = async (currentPage: number) => {
+		setLoading(true);
+		setError({
+			status: false,
+			message: "",
+		});
+		try {
+			const usersDataReceived = await getUsers(currentPage);
+			const usersMapped = mapUsers(usersDataReceived);
+			setUsers((prevUsers) => prevUsers.concat(usersMapped));
+			originalUsers.current = [...originalUsers.current, ...usersMapped];
+		} catch (error) {
+			console.error(error);
+			setError({
+				status: true,
+				message: "Error al cargar los usuarios",
+			});
+		} finally {
+			setLoading(false);
+		}
 	};
 
 	const handleSortValue = (value: SortBy) => {
@@ -55,13 +76,17 @@ export const useGetUsers = () => {
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies(handleGetUsers): <explanation>
 	useEffect(() => {
-		handleGetUsers();
-	}, []);
+		handleGetUsers(currentPage);
+	}, [currentPage]);
 
 	return {
 		users: sorting !== "none" ? sortedUsers() : users,
 		isColorActive,
 		sorting,
+		loading,
+		error,
+		currentPage,
+		setCurrentPage,
 		setSorting,
 		handleSortValue,
 		setIsColorActive,

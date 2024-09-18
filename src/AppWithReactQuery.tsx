@@ -1,24 +1,24 @@
 import { Filters } from "./components/Filters";
 import { UsersTable } from "./components/UsersTable";
-import { useGetUsers } from "./hooks/useGetUsers";
+import { useGetUsersWithReactQuery } from "./hooks/useGetUsersWithReactQuery";
 import "./index.css";
 
-function App() {
+function AppWithReactQuery() {
 	const {
 		users,
 		isColorActive,
 		sorting,
-		loading,
-		error,
-		currentPage,
-		setCurrentPage,
+		isLoading,
+		isError,
+		hasNextPage,
+		fetchNextPage,
 		setSorting,
 		setIsColorActive,
 		handleResetState,
 		deleteUser,
 		handleSearchByCountry,
 		handleSortValue,
-	} = useGetUsers();
+	} = useGetUsersWithReactQuery();
 
 	return (
 		<>
@@ -42,19 +42,20 @@ function App() {
 						handleSortValue={handleSortValue}
 					/>
 				)}
-				{loading && <p>Cargando...</p>}
-				{!loading && error.status && <p>{error.message}</p>}
-				{!loading && !error.status && users.length === 0 && (
+				{isLoading && <p>Cargando...</p>}
+				{!isLoading && isError && <p>{isError}</p>}
+				{!isLoading && !isError && users.length === 0 && (
 					<p>No hay resultados</p>
 				)}
-				{!loading && !error.status && (
-					<button type="button" onClick={() => setCurrentPage(currentPage + 1)}>
+				{!isLoading && !isError && hasNextPage && (
+					<button type="button" onClick={() => fetchNextPage()}>
 						Cargar mas usuarios
 					</button>
 				)}
+				{!isLoading && !isError && !hasNextPage && <p>No hay más resultados</p>}
 			</main>
 		</>
 	);
 }
 
-export default App;
+export default AppWithReactQuery;
